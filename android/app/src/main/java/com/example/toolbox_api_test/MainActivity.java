@@ -54,7 +54,7 @@ public class MainActivity extends FlutterActivity {
   }
 
   private String getStorage(){
-    try{
+    // try{
         System.out.println("LocalAPI variable: " + LocalApi.MASTER);
         // this.localApi = LocalApiFactory.getLocalApi("mi-cyberrange", LocalApi.MASTER, Declaration.DO_NOT_SHARE_DATA);
         // this.genericController = (GenericController) localApi.getStorage();
@@ -66,11 +66,11 @@ public class MainActivity extends FlutterActivity {
         // this.genericController.update(userUUIdNode);
 
         return LocalApi.MASTER;
-    }
-    catch (StorageException | DeclarationMismatchException se){
-        se.printStackTrace();
-        return  "Sorry!";
-    }
+    // }
+    // catch (StorageException | DeclarationMismatchException se){
+    //     se.printStackTrace();
+    //     return  "Sorry!";
+    // }
 }
 
   private int getBatteryLevel() {
