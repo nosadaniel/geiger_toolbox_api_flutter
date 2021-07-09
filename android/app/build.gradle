@@ -1,0 +1,87 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.example.toolbox_api_test"
+        minSdkVersion 26
+        targetSdkVersion 30
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    packagingOptions {
+        exclude "**/attach_hotspot_windows.dll"
+        exclude "META-INF/licenses/**"
+        exclude "META-INF/AL2.0"
+        exclude "META-INF/LGPL2.1"
+        exclude "META-INF/plexus/components.xml"
+        exclude "META-INF/DEPENDENCIES"
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+repositories {
+    maven {
+        url = uri('https://maven.totalcross.com/artifactory/repo1')
+    }
+
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2')
+        mavenContent {
+            releasesOnly()
+        }
+    }
+
+    maven {
+        url = uri('https://oss.sonatype.org/content/repositories/snapshots/')
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+}
+
+dependencies {
+    implementation "eu.cyber-geiger:toolbox-communicationApi:0.0.2b-noH2-SNAPSHOT"
+    implementation "eu.cyber-geiger:toolbox-storage:0.3.3c-noH2-SNAPSHOT"
+    annotationProcessor "org.apache.logging.log4j:log4j-core:2.12.1"
+    implementation 'androidx.annotation:annotation:1.1.0'
+    // implementation 'com.totalcross:totalcross-sdk:7.1.0'
+}
