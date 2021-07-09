@@ -56,7 +56,7 @@ public class MainActivity extends FlutterActivity {
   private String getStorage(){
     try{
         System.out.println("LocalAPI variable: " + LocalApi.MASTER);
-        this.localApi = LocalApiFactory.getLocalApi("mi-cyberrange", LocalApi.MASTER, Declaration.DO_NOT_SHARE_DATA);
+        // this.localApi = LocalApiFactory.getLocalApi("mi-cyberrange", LocalApi.MASTER, Declaration.DO_NOT_SHARE_DATA);
         // this.genericController = (GenericController) localApi.getStorage();
 
         // //create node
