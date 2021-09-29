@@ -40,7 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
     String status;
     try {
       print('Going to get the storage status...');
-      final String result = await platform.invokeMethod('getStorage');
+      final String result =
+          await platform.invokeMethod('setupStorageController');
       status = 'Storage status: $result .';
     } on PlatformException catch (e) {
       status = "Failed to get storage status: '${e.message}'.";
