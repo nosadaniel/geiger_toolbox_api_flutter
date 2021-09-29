@@ -32,12 +32,12 @@ jobs:
     - run: flutter pub get
 
     # Analyze, check formatting, and run unit tests.
-    - name: Analyze the project
-      run: flutter analyze
-    - name: Check the format
-      run: flutter format --set-exit-if-changed --dry-run .
-    - name: Run unit tests
-      run: flutter test
+    # - name: Analyze the project
+    #   run: flutter analyze
+    # - name: Check the format
+    #   run: flutter format --set-exit-if-changed --dry-run .
+    # - name: Run unit tests
+    #   run: flutter test
 
     # # publish to pub.dev
     # - name: Check before publish to pub.dev
