@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:geiger_localstorage/geiger_localstorage.dart' as ToolboxAPI;
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  var _testing_number = '0.1';
+  final String testingNumber = '0.1';
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.yellow,
       ),
-      home: MyHomePage(title: 'Flutter - Toolbox APIs test ' + _testing_number),
+      home: MyHomePage(title: 'Flutter - Toolbox APIs test ' + testingNumber),
     );
   }
 }
@@ -31,25 +31,55 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static const platform = const MethodChannel('com.geiger.dev/toolboxAPI');
+  // ToolboxAPI.StorageController geigerToolboxStorageController =
+  //     ToolboxAPI.GenericController('MI-Cyberrange',
+  //         ToolboxAPI.SqliteMapper('jdbc:sqlite:./dbFileName.sqlite'));
+  ToolboxAPI.StorageController geigerToolboxStorageController =
+      ToolboxAPI.GenericController('MI-Cyberrange', ToolboxAPI.DummyMapper());
 
   // Get battery level.
-  String _getStorageStatus = 'Unknown getStorage status.';
+  String scoreAndLevel = 'Unknown';
 
-  Future<void> _getStorage() async {
-    String status;
+  void sendToGeiger(int level, String random) {
     try {
-      print('Going to get the storage status...');
-      final String result =
-          await platform.invokeMethod('setupStorageController');
-      status = 'Storage status: $result .';
-    } on PlatformException catch (e) {
-      status = "Failed to get storage status: '${e.message}'.";
+      print('Trying to get a node');
+      ToolboxAPI.Node node = geigerToolboxStorageController.get(':score-node');
+      node.addValue(ToolboxAPI.NodeValueImpl('score', '$random'));
+      node.addValue(ToolboxAPI.NodeValueImpl('level', '$level'));
+      geigerToolboxStorageController.update(node);
+      _testAPI();
+    } catch (e) {
+      print('Creating a new node');
+      // print(e.toString());
+      ToolboxAPI.Node node = ToolboxAPI.NodeImpl('score-node');
+      geigerToolboxStorageController.addOrUpdate(node);
+      node.addValue(ToolboxAPI.NodeValueImpl('score', '$random'));
+      node.addValue(ToolboxAPI.NodeValueImpl('level', '$level'));
+      geigerToolboxStorageController.update(node);
+      _testAPI();
     }
+  }
 
-    setState(() {
-      _getStorageStatus = status;
-    });
+  void _testAPI() {
+    try {
+      ToolboxAPI.Node node = geigerToolboxStorageController.get(':score-node');
+      if (node != null) {
+        print('getOwner: ${node.getOwner()}');
+        print('getName: ${node.getName()}');
+        print('getPath: ${node.getPath()}');
+        print('getScore: ${node.getValue('score')}');
+        print('getLevel: ${node.getValue('level')}');
+        setState(() {
+          scoreAndLevel =
+              'Score: ${node.getValue('score')}/ Level: ${node.getValue('level')}';
+        });
+      } else {
+        print('Failed to retrieve the node');
+      }
+    } catch (e) {
+      print('Failed to retrieve the node');
+      print(e.toString());
+    }
   }
 
   @override
@@ -60,10 +90,12 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ElevatedButton(
-              child: Text('Get Storage'),
-              onPressed: _getStorage,
+              child: Text('Test API'),
+              onPressed: () {
+                sendToGeiger(1, DateTime.now().toString());
+              },
             ),
-            Text(_getStorageStatus),
+            Text(scoreAndLevel),
           ],
         ),
       ),
