@@ -2,12 +2,24 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geiger_localstorage/geiger_localstorage.dart' as ToolboxAPI;
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
-void main() {
-  runApp(MyApp());
+late ToolboxAPI.StorageController geigerToolboxStorageController;
+Future<void> main() async {
+  await initGeigerStorage();
+  runApp(MyApp(geigerToolboxStorageController));
+}
+
+Future<void> initGeigerStorage() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  String dbPath = join(await getDatabasesPath(), 'geiger_database.db');
+  geigerToolboxStorageController = ToolboxAPI.GenericController(
+      'MI-Cyberrange', ToolboxAPI.SqliteMapper(dbPath));
 }
 
 class MyApp extends StatelessWidget {
+  MyApp(ToolboxAPI.StorageController geigerToolboxStorageController);
   final String testingNumber = '0.1';
   @override
   Widget build(BuildContext context) {
@@ -31,12 +43,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // ToolboxAPI.StorageController geigerToolboxStorageController =
-  //     ToolboxAPI.GenericController('MI-Cyberrange',
-  //         ToolboxAPI.SqliteMapper('jdbc:sqlite:./dbFileName.sqlite'));
-  ToolboxAPI.StorageController geigerToolboxStorageController =
-      ToolboxAPI.GenericController('MI-Cyberrange', ToolboxAPI.DummyMapper());
-
   // Get battery level.
   String scoreAndLevel = 'Unknown';
 
@@ -44,17 +50,19 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       print('Trying to get a node');
       ToolboxAPI.Node node = geigerToolboxStorageController.get(':score-node');
-      node.addValue(ToolboxAPI.NodeValueImpl('score', '$random'));
-      node.addValue(ToolboxAPI.NodeValueImpl('level', '$level'));
+      node.addOrUpdateValue(ToolboxAPI.NodeValueImpl('score', '$random'));
+      node.addOrUpdateValue(ToolboxAPI.NodeValueImpl('level', '$level'));
       geigerToolboxStorageController.update(node);
       _testAPI();
     } catch (e) {
       print('Creating a new node');
-      // print(e.toString());
+      print(e.toString());
       ToolboxAPI.Node node = ToolboxAPI.NodeImpl('score-node');
+      // ToolboxAPI.Node node = ToolboxAPI.NodeImpl(
+      //     'score-node-${DateTime.now().millisecondsSinceEpoch}');
       geigerToolboxStorageController.addOrUpdate(node);
-      node.addValue(ToolboxAPI.NodeValueImpl('score', '$random'));
-      node.addValue(ToolboxAPI.NodeValueImpl('level', '$level'));
+      node.addOrUpdateValue(ToolboxAPI.NodeValueImpl('score', '$random'));
+      node.addOrUpdateValue(ToolboxAPI.NodeValueImpl('level', '$level'));
       geigerToolboxStorageController.update(node);
       _testAPI();
     }
