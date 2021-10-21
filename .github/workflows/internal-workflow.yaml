@@ -7,24 +7,35 @@ on:
     - dev
   # pull_request:
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  unit-test:
+    name: Unit tests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # os: [ubuntu-18.04, windows-2019, macos-10.15]
+        os: [ubuntu-18.04]
+    # runs-on: ubuntu-latest
+    # container:
+    #   image:  google/dart:latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v1
+    # Set up Flutter.
+    - name: -> Setup Flutter environment
+      uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
       with:
-        java-version: '12.x'
-    - uses: subosito/flutter-action@v1.3.1
-      with:
-        channel: 'dev'
+        channel: master
       env:
         KEY_JKS: ${{ secrets.KEY_JKS }}
         KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: echo $KEY_JKS > keystore.jks && flutter pub get && flutter test && flutter build apk --release
-    - uses: actions/upload-artifact@v2.1.4
+        run: echo $KEY_JKS > key.jks && flutter pub get && flutter build apk --release
+    - uses: actions/upload-artifact@v1
       with:
         name: release-apk
-        path: "**"
+        path: build/app/outputs/apk/release/app-release.apk
+    - run: flutter doctor -v
+
+    # Checkout gallery code and get packages.
+    - name: -> Checkout gallery code
+      uses: actions/checkout@v2
+    - name: -> Get packages
+      run: flutter pub get
