@@ -23,6 +23,11 @@ jobs:
       uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
       with:
         channel: master
+      env:
+        KEY_JKS: ${{ secrets.KEYSTORE }}
+        KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        ALIAS_PASSWORD: ${{ secrets.SIGNING_KEY_ALIAS }}
+        run: echo $KEY_JKS > key.jks
     - run: flutter doctor -v
 
     # Checkout gallery code and get packages.
@@ -40,7 +45,7 @@ jobs:
 
     # Build the artifact
     - name: Generate apk file
-      run: flutter build apk
+      run: flutter build apk --release
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
