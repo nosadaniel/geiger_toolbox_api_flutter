@@ -15,30 +15,30 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 
 //Geiger packages - communication API
-import ch.fhnw.geiger.localstorage.StorageException;
-import eu.cybergeiger.communication.Declaration;
-import eu.cybergeiger.communication.DeclarationMismatchException;
-import ch.fhnw.geiger.localstorage.db.GenericController;
-import eu.cybergeiger.communication.LocalApi;
-import eu.cybergeiger.communication.LocalApiFactory;
-import ch.fhnw.geiger.localstorage.db.data.Node;
-import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
+// import ch.fhnw.geiger.localstorage.StorageException;
+// import eu.cybergeiger.communication.Declaration;
+// import eu.cybergeiger.communication.DeclarationMismatchException;
+// import ch.fhnw.geiger.localstorage.db.GenericController;
+// import eu.cybergeiger.communication.LocalApi;
+// import eu.cybergeiger.communication.LocalApiFactory;
+// import ch.fhnw.geiger.localstorage.db.data.Node;
+// import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 
-// Geiger - LocalStorage
-import static ch.fhnw.geiger.localstorage.Visibility.RED;
-import static ch.fhnw.geiger.localstorage.Visibility.GREEN;
-import ch.fhnw.geiger.localstorage.db.GenericController;
-import ch.fhnw.geiger.localstorage.db.data.Node;
-import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
-import ch.fhnw.geiger.localstorage.db.data.NodeValue;
-import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
-import ch.fhnw.geiger.localstorage.db.mapper.DummyMapper;
+// // Geiger - LocalStorage
+// import static ch.fhnw.geiger.localstorage.Visibility.RED;
+// import static ch.fhnw.geiger.localstorage.Visibility.GREEN;
+// import ch.fhnw.geiger.localstorage.db.GenericController;
+// import ch.fhnw.geiger.localstorage.db.data.Node;
+// import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
+// import ch.fhnw.geiger.localstorage.db.data.NodeValue;
+// import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
+// import ch.fhnw.geiger.localstorage.db.mapper.DummyMapper;
 
 public class MainActivity extends FlutterActivity {
   private static final String CHANNEL = "com.geiger.dev/toolboxAPI";
 
-  private LocalApi localApi;
-  private GenericController controller;
+  // private LocalApi localApi;
+  // private GenericController controller;
   // private GenericController genericController;
 
     private final static String miPluginUUID = "a2fdb2e9-b070-4e14-b28a-52066a9e3e99";
@@ -59,8 +59,8 @@ public class MainActivity extends FlutterActivity {
     new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
         .setMethodCallHandler(
           (call, result) -> {
-            if (call.method.equals("setupStorageController")) {
-              String message = setupStorageController();
+            if (call.method.equals("getBatteryLevel")) {
+              String message = getBatteryLevel() + " %";
               if (!message.isEmpty()) {
                 result.success(message);
               } else {
@@ -74,49 +74,49 @@ public class MainActivity extends FlutterActivity {
         );
   }
 
-  private String setupStorageController(){
-    String retMsg = "BAD";
-    try {
-      // Setup Storage Controller
-      this.controller = new GenericController("testOwner", new DummyMapper());
-      this.controller.zap();
+  // private String setupStorageController(){
+  //   String retMsg = "BAD";
+  //   try {
+  //     // Setup Storage Controller
+  //     this.controller = new GenericController("testOwner", new DummyMapper());
+  //     this.controller.zap();
 
-      this.controller.add(new NodeImpl("parent1", ""));
-    // updated Node with different visibility children
-      NodeImpl node = new NodeImpl("testNode1", ":parent1", GREEN);
-      this.controller.add(node);
-      retMsg = "testOwner" + node.getOwner();
-      retMsg += "\'n"+String.valueOf(GREEN) + String.valueOf(node.getVisibility());
-      System.out.println("testOwner: "+ node.getOwner());
-      NodeImpl sn = new NodeImpl("testChild1", ":parent1:testNode1");
-      this.controller.add(sn);
-      node.setVisibility(RED);
-      node.addChild(sn);
+  //     this.controller.add(new NodeImpl("parent1", ""));
+  //   // updated Node with different visibility children
+  //     NodeImpl node = new NodeImpl("testNode1", ":parent1", GREEN);
+  //     this.controller.add(node);
+  //     retMsg = "testOwner" + node.getOwner();
+  //     retMsg += "\'n"+String.valueOf(GREEN) + String.valueOf(node.getVisibility());
+  //     System.out.println("testOwner: "+ node.getOwner());
+  //     NodeImpl sn = new NodeImpl("testChild1", ":parent1:testNode1");
+  //     this.controller.add(sn);
+  //     node.setVisibility(RED);
+  //     node.addChild(sn);
 
-      // update with node from above
-      this.controller.update(node);
+  //     // update with node from above
+  //     this.controller.update(node);
 
-      // get the record
-      Node storedNode = this.controller.get(":parent1:testNode1");
+  //     // get the record
+  //     Node storedNode = this.controller.get(":parent1:testNode1");
 
-      // check results
-      System.out.println("testOwner:" + storedNode.getOwner());
-      retMsg += "\ntestOwner" + storedNode.getOwner();
-      System.out.println("testNode1:" + storedNode.getName());
-      retMsg += "\ntestNode1" + storedNode.getName();
-      System.out.println(":parent1:testNode1" + storedNode.getPath());
-      retMsg += "\n:parent1:testNode1" + storedNode.getPath();
-      System.out.println("testChild1" + storedNode.getChildNodesCsv());
-      retMsg += "\ntestChild1" + storedNode.getChildNodesCsv();
-      System.out.println(String.valueOf(RED) + String.valueOf(storedNode.getVisibility()));
-      retMsg += "\'n"+String.valueOf(RED) + String.valueOf(storedNode.getVisibility());
-      return retMsg;
-    }
-    catch (StorageException se){
-        se.printStackTrace();
-        return  "BAD!";
-    }
-  }
+  //     // check results
+  //     System.out.println("testOwner:" + storedNode.getOwner());
+  //     retMsg += "\ntestOwner" + storedNode.getOwner();
+  //     System.out.println("testNode1:" + storedNode.getName());
+  //     retMsg += "\ntestNode1" + storedNode.getName();
+  //     System.out.println(":parent1:testNode1" + storedNode.getPath());
+  //     retMsg += "\n:parent1:testNode1" + storedNode.getPath();
+  //     System.out.println("testChild1" + storedNode.getChildNodesCsv());
+  //     retMsg += "\ntestChild1" + storedNode.getChildNodesCsv();
+  //     System.out.println(String.valueOf(RED) + String.valueOf(storedNode.getVisibility()));
+  //     retMsg += "\'n"+String.valueOf(RED) + String.valueOf(storedNode.getVisibility());
+  //     return retMsg;
+  //   }
+  //   catch (StorageException se){
+  //       se.printStackTrace();
+  //       return  "BAD!";
+  //   }
+  // }
 
 //   // write recommendation to GEIGER data store
 //   private void addBasicCyberrangeRecommendation() {
