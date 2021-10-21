@@ -23,6 +23,11 @@ jobs:
       uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
       with:
         channel: master
+      env:
+        KEY_JKS: ${{ secrets.KEY_JKS }}
+        KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+        ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: echo $KEY_JKS > keystore.jks
     - run: flutter doctor -v
 
     # Checkout gallery code and get packages.
