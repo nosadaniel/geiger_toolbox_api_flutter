@@ -36,6 +36,23 @@ android {
         versionName flutterVersionName
     }
 
+    signingConfigs {
+        release {
+            def tmpFilePath = System.getProperty("user.home") + "/work/_temp/keystore/"
+            def allFilesFromDir = new File(tmpFilePath).listFiles()
+
+            if (allFilesFromDir != null) {
+                def keystoreFile = allFilesFromDir.first()
+                keystoreFile.renameTo("keystore/your_keystore.jks")
+            }
+
+            storeFile = file("keystore/your_keystore.jks")
+            storePassword System.getenv("SIGNING_STORE_PASSWORD")
+            keyAlias System.getenv("SIGNING_KEY_ALIAS")
+            keyPassword System.getenv("SIGNING_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
@@ -79,9 +96,6 @@ repositories {
 }
 
 dependencies {
-    implementation "eu.cyber-geiger:toolbox-communicationApi:0.0.2b-noH2-SNAPSHOT"
-    implementation "eu.cyber-geiger:toolbox-storage:0.3.3c-noH2-SNAPSHOT"
-    annotationProcessor "org.apache.logging.log4j:log4j-core:2.12.1"
     implementation 'androidx.annotation:annotation:1.1.0'
     // implementation 'com.totalcross:totalcross-sdk:7.1.0'
 }
