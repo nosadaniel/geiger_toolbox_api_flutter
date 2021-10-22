@@ -27,16 +27,20 @@ jobs:
     - name: -> Install dependencies
       run: flutter pub get
     - name: -> Generate the keystore file
-      env:
-        KEY_JKS: ${{ secrets.KEY_JKS }}
-        KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
-        ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      run: echo $KEY_JKS > android/keystore.jks
+      id: decode_keystore
+      uses: timheuer/base64-to-file@v1
+      with:
+        fileName: 'android/keystore.jks'
+        encodedString: ${{ secrets.KEY_JKS }}
+      # run: echo $KEY_JKS > android/keystore.jks
     - name: -> Where am I?
       run: pwd && ls
     - name: -> check the keystore file
       run: ls android/
     - name: -> Generate apk file
+      env:
+        KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+        ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: flutter build apk --release
     - name: -> show the content in build/
       run: ls build/
