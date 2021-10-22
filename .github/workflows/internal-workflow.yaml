@@ -26,14 +26,18 @@ jobs:
         channel: master
     - name: -> Install dependencies
       run: flutter pub get
-    - name: -> Generate the apk file
+    - name: -> Generate the keystore file
       env:
         KEY_JKS: ${{ secrets.KEY_JKS }}
         KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      run: echo $KEY_JKS > keystore.jks && flutter build apk --release
+      run: echo $KEY_JKS > keystore.jks
     - name: -> Where am I?
       run: pwd && ls
+    - name: -> check the keystore file
+      run: ls android/
+    - name: -> Generate apk file
+      run: flutter build apk --release
     - name: -> show the content in build/
       run: ls build/
     - name: -> show the content in build/app
