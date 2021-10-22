@@ -4,60 +4,38 @@ on:
   push:
     branches:
     - main
-    - dev
-  # pull_request:
 jobs:
   unit-test:
-    name: Unit tests on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        # os: [ubuntu-18.04, windows-2019, macos-10.15]
-        os: [ubuntu-18.04]
-    # runs-on: ubuntu-latest
-    # container:
-    #   image:  google/dart:latest
+    name: Unit test on ubuntu-18.04
+    runs-on: ubuntu-18.04
     steps:
-    # Set up Flutter.
     - uses: actions/checkout@v2
+    - name: -> Decode the keystore
+      id: decode_keystore
+      uses: timheuer/base64-to-file@v1
+      with:
+        fileName: 'keystore.jks'
+        encodedString: ${{ secrets.KEY_JKS }}
+    - name: -> Relocate the keystore file
+      run: cp ${{steps.decode_keystore.outputs.filePath}} android/
     - name: -> Setup Flutter environment
       uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
       with:
         channel: master
+    - name: -> Check the environment
+      run: flutter doctor -v
     - name: -> Install dependencies
       run: flutter pub get
-    - name: -> Generate the keystore file
-      id: decode_keystore
-      uses: timheuer/base64-to-file@v1
-      with:
-        fileName: 'android/keystore.jks'
-        encodedString: ${{ secrets.KEY_JKS }}
-      # run: echo $KEY_JKS > android/keystore.jks
-    - name: -> relocate the encoded keystore
-      run: cp ${{steps.decode_keystore.outputs.filePath}} android/
-    - name: -> Where am I?
-      run: pwd && ls
-    - name: -> check the keystore file
-      run: ls android/
+    # - name: -> Analyze the source code
+    #   run: flutter analyze
+    # - name: -> Unit test
+    #   run: flutter test
     - name: -> Generate apk file
       env:
         KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: flutter build apk --release
-    - name: -> show the content in build/
-      run: ls build/
-    - name: -> show the content in build/app
-      run: ls build/app
-    - name: -> show the content in build/app/outputs
-      run: ls build/app/outputs
     - uses: actions/upload-artifact@v2
       with:
         name: release-apk
         path: build/app/outputs/flutter-apk/app-release.apk
-    # - run: flutter doctor -v
-
-    # Checkout gallery code and get packages.
-    # - name: -> Checkout gallery code
-    #   uses: actions/checkout@v2
-    # - name: -> Get packages
-    #   run: flutter pub get
