@@ -31,7 +31,7 @@ jobs:
         KEY_JKS: ${{ secrets.KEY_JKS }}
         KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: echo $KEY_JKS > keystore.jks && flutter build apk --release
+      run: echo $KEY_JKS > keystore.jks && flutter build apk --release
     - name: -> Where am I?
       run: pwd && ls
     - name: -> show the content in build/
