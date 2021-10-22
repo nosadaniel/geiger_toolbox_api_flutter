@@ -33,6 +33,8 @@ jobs:
         fileName: 'android/keystore.jks'
         encodedString: ${{ secrets.KEY_JKS }}
       # run: echo $KEY_JKS > android/keystore.jks
+    - name: -> relocate the encoded keystore
+      run: cp ${{steps.decode_keystore.outputs.filePath}} android/
     - name: -> Where am I?
       run: pwd && ls
     - name: -> check the keystore file
