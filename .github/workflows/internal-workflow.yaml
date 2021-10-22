@@ -24,17 +24,22 @@ jobs:
       uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
       with:
         channel: master
+    - name: -> Install dependencies
+      run: flutter pub get
+    - name: -> Generate the apk file
       env:
         KEY_JKS: ${{ secrets.KEY_JKS }}
         KEY_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
         ALIAS_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: echo $KEY_JKS > keystore.jks && flutter pub get && flutter build apk --release
-    # - name: -> Install dependencies
-    #   run: flutter pub get
+        run: echo $KEY_JKS > keystore.jks && flutter build apk --release
     - name: -> Where am I?
-      run: pwd
-    - name: -> show the content
-      run: ls build/app/outputs/flutter-apk/
+      run: pwd && ls
+    - name: -> show the content in build/
+      run: ls build/
+    - name: -> show the content in build/app
+      run: ls build/app
+    - name: -> show the content in build/app/outputs
+      run: ls build/app/outputs
     - uses: actions/upload-artifact@v2
       with:
         name: release-apk
