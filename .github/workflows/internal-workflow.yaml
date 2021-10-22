@@ -30,16 +30,16 @@ jobs:
         run: echo $KEY_JKS > keystore.jks && flutter pub get && flutter build apk --release
     # - name: -> Install dependencies
     #   run: flutter pub get
-    # - name: -> Build apk file
-    #   run: flutter build apk
+    - name: -> Where am I?
+      run: pwd && cd ..
     - uses: actions/upload-artifact@v1
       with:
         name: release-apk
         path: build/app/outputs/flutter-apk/app-release.apk
-    - run: flutter doctor -v
+    # - run: flutter doctor -v
 
     # Checkout gallery code and get packages.
-    - name: -> Checkout gallery code
-      uses: actions/checkout@v2
-    - name: -> Get packages
-      run: flutter pub get
+    # - name: -> Checkout gallery code
+    #   uses: actions/checkout@v2
+    # - name: -> Get packages
+    #   run: flutter pub get
