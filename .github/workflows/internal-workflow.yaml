@@ -19,6 +19,7 @@ jobs:
     #   image:  google/dart:latest
     steps:
     # Set up Flutter.
+    - uses: actions/checkout@v2
     - name: -> Setup Flutter environment
       uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
       with:
@@ -31,8 +32,10 @@ jobs:
     # - name: -> Install dependencies
     #   run: flutter pub get
     - name: -> Where am I?
-      run: pwd && cd ..
-    - uses: actions/upload-artifact@v1
+      run: pwd
+    - name: -> show the content
+      run: ls build/app/outputs/flutter-apk/
+    - uses: actions/upload-artifact@v2
       with:
         name: release-apk
         path: build/app/outputs/flutter-apk/app-release.apk
