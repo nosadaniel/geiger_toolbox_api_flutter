@@ -1,109 +1,64 @@
 import 'dart:async';
-
+import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:geiger_localstorage/geiger_localstorage.dart' as ToolboxAPI;
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:toolbox_api_test/geiger_connector.dart';
 
-late ToolboxAPI.StorageController geigerToolboxStorageController;
+GeigerConnector geigerConnector = GeigerConnector();
 Future<void> main() async {
-  await initGeigerStorage();
-  runApp(MyApp(geigerToolboxStorageController));
-}
-
-Future<void> initGeigerStorage() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  String dbPath = join(await getDatabasesPath(), 'geiger_database.db');
-  geigerToolboxStorageController = ToolboxAPI.GenericController(
-      'MI-Cyberrange', ToolboxAPI.SqliteMapper(dbPath));
+  await geigerConnector.initGeigerStorage();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp(ToolboxAPI.StorageController geigerToolboxStorageController);
-  final String testingNumber = '0.1';
   @override
   Widget build(BuildContext context) {
+    log('Start building the application');
     return MaterialApp(
-      title: 'Flutter - Toolbox APIs',
-      theme: ThemeData(
-        primarySwatch: Colors.yellow,
-      ),
-      home: MyHomePage(title: 'Flutter - Toolbox APIs test ' + testingNumber),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   // Get battery level.
-  String scoreAndLevel = 'Unknown';
-
-  void sendToGeiger(int level, String random) {
-    try {
-      print('Trying to get a node');
-      ToolboxAPI.Node node = geigerToolboxStorageController.get(':score-node');
-      node.addOrUpdateValue(ToolboxAPI.NodeValueImpl('score', '$random'));
-      node.addOrUpdateValue(ToolboxAPI.NodeValueImpl('level', '$level'));
-      geigerToolboxStorageController.update(node);
-      _testAPI();
-    } catch (e) {
-      print('Creating a new node');
-      print(e.toString());
-      ToolboxAPI.Node node = ToolboxAPI.NodeImpl('score-node');
-      // ToolboxAPI.Node node = ToolboxAPI.NodeImpl(
-      //     'score-node-${DateTime.now().millisecondsSinceEpoch}');
-      geigerToolboxStorageController.addOrUpdate(node);
-      node.addOrUpdateValue(ToolboxAPI.NodeValueImpl('score', '$random'));
-      node.addOrUpdateValue(ToolboxAPI.NodeValueImpl('level', '$level'));
-      geigerToolboxStorageController.update(node);
-      _testAPI();
-    }
-  }
-
-  void _testAPI() {
-    try {
-      ToolboxAPI.Node node = geigerToolboxStorageController.get(':score-node');
-      if (node != null) {
-        print('getOwner: ${node.getOwner()}');
-        print('getName: ${node.getName()}');
-        print('getPath: ${node.getPath()}');
-        print('getScore: ${node.getValue('score')}');
-        print('getLevel: ${node.getValue('level')}');
-        setState(() {
-          scoreAndLevel =
-              'Score: ${node.getValue('score')}/ Level: ${node.getValue('level')}';
-        });
-      } else {
-        print('Failed to retrieve the node');
-      }
-    } catch (e) {
-      print('Failed to retrieve the node');
-      print(e.toString());
-    }
-  }
-
+  String geigerData = geigerConnector.readDataFromGeigerStorage() ?? 'Failed';
+  TextEditingController inputDataController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Center(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Geiger APIs"),
+      ),
+      body: Container(
+        margin: EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            ElevatedButton(
-              child: Text('Test API'),
-              onPressed: () {
-                sendToGeiger(1, DateTime.now().toString());
-              },
+            TextField(
+              controller: inputDataController,
             ),
-            Text(scoreAndLevel),
+            ElevatedButton(
+              onPressed: () {
+                log('Enter data: ${inputDataController.text}');
+                String inputData = inputDataController.text.trim();
+                if (inputData != '') {
+                  geigerConnector.writeToGeigerStorage(inputData);
+                  inputDataController.clear();
+                  setState(() {
+                    geigerData = geigerConnector.readDataFromGeigerStorage() ??
+                        'Failed!';
+                  });
+                }
+              },
+              child: const Text('Save to Geiger Storage'),
+            ),
+            SizedBox(height: 20),
+            Text('Geiger Data: $geigerData'),
           ],
         ),
       ),
