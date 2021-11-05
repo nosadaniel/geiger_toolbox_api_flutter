@@ -5,6 +5,7 @@ import 'package:toolbox_api_test/geiger_connector.dart';
 
 GeigerConnector geigerConnector = GeigerConnector();
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await geigerConnector.initGeigerStorage();
   runApp(MyApp());
 }

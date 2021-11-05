@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:geiger_localstorage/geiger_localstorage.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -8,7 +7,6 @@ import 'package:sqflite/sqflite.dart';
 class GeigerConnector {
   late StorageController geigerToolboxStorageController;
   Future<void> initGeigerStorage() async {
-    WidgetsFlutterBinding.ensureInitialized();
     String dbPath = join(await getDatabasesPath(), 'geiger_database.db');
     log('Database path: $dbPath');
     geigerToolboxStorageController =
