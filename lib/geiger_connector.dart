@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:geiger_localstorage/geiger_localstorage.dart';
 import 'package:geiger_localstorage/src/visibility.dart' as GGVisibility;
 import 'package:path/path.dart';
