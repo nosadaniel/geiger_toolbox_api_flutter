@@ -5,10 +5,12 @@ import 'package:toolbox_api_test/geiger_connector.dart';
 import 'package:toolbox_api_test/utils.dart';
 
 GeigerConnector geigerConnector = GeigerConnector();
+String? firstData;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await readPackageInfo();
   await geigerConnector.initGeigerStorage();
+  firstData = await geigerConnector.readDataFromGeigerStorage();
   runApp(MyApp());
 }
 
@@ -29,7 +31,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   // Get battery level.
-  String geigerData = geigerConnector.readDataFromGeigerStorage() ?? 'Failed';
+  String geigerData = firstData ?? 'Failed';
   TextEditingController inputDataController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -46,16 +48,17 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: inputDataController,
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 log('Enter data: ${inputDataController.text}');
                 String inputData = inputDataController.text.trim();
                 if (inputData != '') {
-                  geigerConnector.writeToGeigerStorage(inputData);
-                  inputDataController.clear();
+                  await geigerConnector.writeToGeigerStorage(inputData);
+                  String? newData =
+                      await geigerConnector.readDataFromGeigerStorage();
                   setState(() {
-                    geigerData = geigerConnector.readDataFromGeigerStorage() ??
-                        'Failed!';
+                    geigerData = newData ?? 'Failed!';
                   });
+                  inputDataController.clear();
                 }
               },
               child: const Text('Save to Geiger Storage'),
