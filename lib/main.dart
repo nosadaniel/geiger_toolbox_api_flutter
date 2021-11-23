@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:toolbox_api_test/geiger_connector.dart';
+import 'package:toolbox_api_test/utils.dart';
 
 GeigerConnector geigerConnector = GeigerConnector();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await readPackageInfo();
   await geigerConnector.initGeigerStorage();
   runApp(MyApp());
 }
@@ -33,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Geiger APIs"),
+        title: Text("Geiger APIs - Version ${getVersion()}"),
       ),
       body: Container(
         margin: EdgeInsets.all(20),
