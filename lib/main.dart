@@ -8,8 +8,11 @@ GeigerConnector geigerConnector = GeigerConnector();
 String? firstData;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  log('ensure initialized');
   await readPackageInfo();
+  log('initialized packaged info');
   await geigerConnector.initGeigerStorage();
+  log('initialized geiger storage');
   firstData = await geigerConnector.readDataFromGeigerStorage();
   runApp(MyApp());
 }
@@ -53,8 +56,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 String inputData = inputDataController.text.trim();
                 if (inputData != '') {
                   await geigerConnector.writeToGeigerStorage(inputData);
+                  log('Data has been written, going to read it');
                   String? newData =
                       await geigerConnector.readDataFromGeigerStorage();
+                  log('Going to update the state');
                   setState(() {
                     geigerData = newData ?? 'Failed!';
                   });
