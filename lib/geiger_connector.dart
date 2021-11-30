@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:geiger_api/geiger_api.dart';
 import 'package:geiger_localstorage/geiger_localstorage.dart';
 import 'package:geiger_localstorage/src/visibility.dart' as GGVisibility;
 // import 'package:path/path.dart';
@@ -15,10 +16,12 @@ class GeigerConnector {
     String dbPath = 'geigerDB.sqlite';
     log('Database path: $dbPath');
     try {
-      await StorageMapper.initDatabaseExpander();
+      GeigerApi? geigerApi =
+          await getGeigerApi("", GeigerApi.masterId, Declaration.doShareData);
+      //await StorageMapper.initDatabaseExpander();
       // storageController =
       //     GenericController(geigerOwner, DummyMapper(geigerOwner));
-      storageController = GenericController(geigerOwner, SqliteMapper(dbPath));
+      storageController = (geigerApi!.getStorage())!;
     } catch (e) {
       log(e.toString());
       log('Failed to create storageController');

@@ -27,7 +27,10 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.0
   sqflite: ^2.0.0+4
   package_info_plus: ^1.3.0
-  geiger_localstorage: ^0.6.14
+  geiger_api:
+    git:
+      url: git://github.com/cyber-geiger/toolbox-communicationApi.git
+      ref: development
 
 dev_dependencies:
   flutter_test:

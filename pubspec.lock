@@ -93,8 +93,17 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  geiger_localstorage:
+  geiger_api:
     dependency: "direct main"
+    description:
+      path: "."
+      ref: development
+      resolved-ref: b0ec44634f6a499788d154fdb26e81d13da60dab
+      url: "git://github.com/cyber-geiger/toolbox-communicationApi.git"
+    source: git
+    version: "0.5.3"
+  geiger_localstorage:
+    dependency: transitive
     description:
       name: geiger_localstorage
       url: "https://pub.dartlang.org"
